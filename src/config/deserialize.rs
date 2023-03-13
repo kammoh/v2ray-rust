@@ -16,8 +16,8 @@ pub(super) fn from_str_to_cipher_kind<'de, D>(deserializer: D) -> Result<CipherK
 where
     D: Deserializer<'de>,
 {
-    let method: &str = Deserialize::deserialize(deserializer)?;
-    let method = match method {
+    let method: String = Deserialize::deserialize(deserializer)?;
+    let method = match method.as_str() {
         "none" | "plain" => CipherKind::None,
         "aes-128-gcm" => CipherKind::Aes128Gcm,
         "aes-256-gcm" => CipherKind::Aes256Gcm,
@@ -30,7 +30,7 @@ pub(super) fn from_str_to_address<'de, D>(deserializer: D) -> Result<Address, D:
 where
     D: Deserializer<'de>,
 {
-    let addr: &str = Deserialize::deserialize(deserializer)?;
+    let addr: String = Deserialize::deserialize(deserializer)?;
     addr.parse()
         .map_err(|e: AddressError| Error::custom(e.as_str()))
 }
@@ -48,7 +48,7 @@ where
     D: Deserializer<'de>,
 {
     let security_num: u8;
-    let security: &str = Deserialize::deserialize(deserializer)?;
+    let security: String = Deserialize::deserialize(deserializer)?;
     if security == "aes-128-gcm" {
         security_num = 0x03;
     } else if security == "chacha20-poly1305" {
@@ -76,8 +76,8 @@ pub(super) fn from_str_to_uuid<'de, D>(deserializer: D) -> Result<Uuid, D::Error
 where
     D: Deserializer<'de>,
 {
-    let uuid_str: &str = Deserialize::deserialize(deserializer)?;
-    Uuid::parse_str(uuid_str).map_err(Error::custom)
+    let uuid_str: String = Deserialize::deserialize(deserializer)?;
+    Uuid::parse_str(&uuid_str).map_err(Error::custom)
 }
 
 #[derive(Clone)]
@@ -173,7 +173,7 @@ pub(super) fn from_str_to_path<'de, D>(deserializer: D) -> Result<PathAndQuery, 
 where
     D: Deserializer<'de>,
 {
-    let path_and_query: &str = Deserialize::deserialize(deserializer)?;
+    let path_and_query: String = Deserialize::deserialize(deserializer)?;
     path_and_query.try_into().map_err(Error::custom)
 }
 
@@ -181,7 +181,7 @@ pub(super) fn from_str_to_grpc_path<'de, D>(deserializer: D) -> Result<PathAndQu
 where
     D: Deserializer<'de>,
 {
-    let service_name: &str = Deserialize::deserialize(deserializer)?;
+    let service_name: String = Deserialize::deserialize(deserializer)?;
     let path_and_query = format!("/{}/Tun", service_name);
     path_and_query.try_into().map_err(Error::custom)
 }
@@ -190,16 +190,16 @@ pub(super) fn from_str_to_http_method<'de, D>(deserializer: D) -> Result<Method,
 where
     D: Deserializer<'de>,
 {
-    let method: &str = Deserialize::deserialize(deserializer)?;
-    method.try_into().map_err(Error::custom)
+    let method: String = Deserialize::deserialize(deserializer)?;
+    method.as_str().try_into().map_err(Error::custom)
 }
 
 pub(super) fn from_str_to_ws_uri<'de, D>(deserializer: D) -> Result<EarlyDataUri, D::Error>
 where
     D: Deserializer<'de>,
 {
-    let uri: &str = Deserialize::deserialize(deserializer)?;
-    EarlyDataUri::new(uri).map_err(Error::custom)
+    let uri: String = Deserialize::deserialize(deserializer)?;
+    EarlyDataUri::new(&uri).map_err(Error::custom)
 }
 
 // adapted from webpki::DnsNameRef
@@ -291,7 +291,7 @@ pub(super) fn from_str_to_sni<'de, D>(deserializer: D) -> Result<String, D::Erro
 where
     D: Deserializer<'de>,
 {
-    let sni: &str = Deserialize::deserialize(deserializer)?;
+    let sni: String = Deserialize::deserialize(deserializer)?;
     if is_valid_dns_id(sni.as_bytes()) {
         Ok(sni.to_owned())
     } else {
